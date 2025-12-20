@@ -1,0 +1,65 @@
+Documentação de Concepção do Sistema: Gestão de Locação e Estoque (Equipamentos de Obra)
+1. Objetivo do Produto
+Desenvolver um sistema web para gestão de locação de equipamentos de construção civil (escoramento, andaimes, barras de ferro), focado na rastreabilidade do inventário. O objetivo principal é controlar o saldo de equipamentos em cada obra, monitorar o ciclo de vida do ativo (Disponível → Em Obra → Manutenção → Disponível) e gerar evidências para cobrança de extravios ou avarias no retorno.
+
+2. Visão Geral do Fluxo (Workflow)
+O fluxo de negócio identificado na conversa segue a seguinte lógica circular:
+
+
+Compra/Entrada: Equipamento entra no estoque geral.
+
+
+Contrato/Reserva: Equipamento é vinculado a uma Obra/Cliente por um prazo determinado.
+
+
+Remessa (Saída): Envio físico para a obra (baseado em Nota Fiscal de Remessa) → Baixa no Estoque Disponível → Entrada no Saldo da Obra.
+
+Período de Locação: O equipamento fica na posse do cliente. O sistema deve projetar a data de retorno.
+
+Retorno/Devolução: O cliente devolve o material. O sistema confronta Enviado vs. Devolvido.
+
+
+Triagem/Manutenção: O material devolvido entra em "Manutenção" antes de ficar "Disponível" novamente.
+
+
+Conciliação/Cobrança: Se houver diferença (perda) ou dano, gera-se uma cobrança/venda para o cliente.
+
+3. Requisitos Funcionais (O que o sistema deve fazer)
+Módulo 1: Gestão de Cadastros (Backoffice)
+
+Cadastro de Equipamentos (SKU): Permitir cadastrar tipos de equipamentos (ex: barras, tripés, andaimes) com código e descrição.
+
+
+Cadastro de Obras/Projetos: Cadastro da obra vinculado a um CNPJ/Cliente, com endereço e contatos responsáveis no local.
+
+
+Cadastro de Contratos: Vincular uma obra a um contrato, definindo prazos de locação e previsões de faturamento.
+
+Módulo 2: Controle de Estoque e Movimentação
+Status do Item: O equipamento deve possuir três status macro:
+
+
+Disponível (Pronto para locação).
+
+
+Alocado/Em Obra (Na posse do cliente).
+
+
+Em Manutenção (Devolvido, mas aguardando reparo/limpeza).
+
+Movimentação de Saída (Remessa): Dar baixa no estoque disponível e alocar para uma obra específica. Deve permitir inserir o número da Nota Fiscal de Remessa para conciliação.
+
+Movimentação de Entrada (Retorno): Registrar o retorno dos itens. O sistema deve calcular automaticamente o saldo (Enviado - Retornado = Pendente).
+
+
+Transferência para Manutenção: Após o retorno, os itens entram automaticamente ou manualmente em uma fila de manutenção, ficando indisponíveis para nova locação até serem liberados.
+
+Módulo 3: Relatórios e Conciliação
+
+Extrato da Obra: Relatório detalhado que mostra o saldo atual de equipamentos na obra para provar ao cliente o que está com ele (Fundamental para evitar disputas).
+
+
+Alerta de Divergência: Ao fechar um contrato, apontar a diferença entre o enviado e o devolvido para gerar a cobrança de indenização (material não devolvido).
+
+
+Previsão de Disponibilidade (Forecast): Visualização de quando os equipamentos retornarão para permitir novas vendas futuras.
