@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.git
+.gitignore
+sqlite.db
+sqlite.db-journal
+.vs
+data
+.replit
+attached_assets
