@@ -177,7 +177,7 @@ export class DatabaseStorage implements IStorage {
         movement: movements,
         project: projects,
         client: clients,
-        itemsCount: sql<number>`count(${movementItems.id})::int`
+        itemsCount: sql<number>`count(${movementItems.id})`
       })
       .from(movements)
       .innerJoin(projects, eq(movements.projectId, projects.id))
@@ -262,7 +262,7 @@ export class DatabaseStorage implements IStorage {
 
   async completeMaintenance(id: number): Promise<Maintenance> {
     const [updated] = await db.update(maintenance)
-      .set({ status: 'COMPLETED', endDate: new Date() })
+      .set({ status: 'COMPLETED', endDate: new Date().toISOString() })
       .where(eq(maintenance.id, id))
       .returning();
     return updated;

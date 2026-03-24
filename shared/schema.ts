@@ -1,68 +1,63 @@
-import { pgTable, text, serial, integer, boolean, timestamp, date } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// === TABLE DEFINITIONS ===
-
-export const clients = pgTable("clients", {
-  id: serial("id").primaryKey(),
+export const clients = sqliteTable("clients", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   cnpj: text("cnpj").notNull().unique(), // Brazilian tax ID
   email: text("email"),
   phone: text("phone"),
   address: text("address"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const projects = pgTable("projects", {
-  id: serial("id").primaryKey(),
+export const projects = sqliteTable("projects", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   clientId: integer("client_id").notNull().references(() => clients.id),
-  name: text("name").notNull(), // Project name / Site name
+  name: text("name").notNull(),
   address: text("address").notNull(),
-  manager: text("manager"), // Contact person at site
-  active: boolean("active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  manager: text("manager"),
+  active: integer("active", { mode: 'boolean' }).default(true),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const equipments = pgTable("equipments", {
-  id: serial("id").primaryKey(),
+export const equipments = sqliteTable("equipments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   sku: text("sku").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
-  totalStock: integer("total_stock").notNull().default(0), // Total assets owned
-  createdAt: timestamp("created_at").defaultNow(),
+  totalStock: integer("total_stock").notNull().default(0),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-// Movements: Shipping to site (OUT) or Returning from site (IN)
-export const movements = pgTable("movements", {
-  id: serial("id").primaryKey(),
+export const movements = sqliteTable("movements", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   projectId: integer("project_id").notNull().references(() => projects.id),
-  type: text("type", { enum: ["OUT", "IN"] }).notNull(), // OUT = Remessa (To Site), IN = Devolução (From Site)
-  date: timestamp("date").notNull().defaultNow(),
-  invoiceNumber: text("invoice_number"), // Nota Fiscal
+  type: text("type").notNull(),
+  date: text("date").notNull().default(sql`CURRENT_TIMESTAMP`),
+  invoiceNumber: text("invoice_number"),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const movementItems = pgTable("movement_items", {
-  id: serial("id").primaryKey(),
+export const movementItems = sqliteTable("movement_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   movementId: integer("movement_id").notNull().references(() => movements.id),
   equipmentId: integer("equipment_id").notNull().references(() => equipments.id),
-  quantity: integer("quantity").notNull(), // Positive integer
+  quantity: integer("quantity").notNull(),
 });
 
-export const maintenance = pgTable("maintenance", {
-  id: serial("id").primaryKey(),
+export const maintenance = sqliteTable("maintenance", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   equipmentId: integer("equipment_id").notNull().references(() => equipments.id),
   quantity: integer("quantity").notNull(),
   reason: text("reason"),
-  startDate: timestamp("start_date").defaultNow(),
-  endDate: timestamp("end_date"), // When fixed/returned to stock
-  status: text("status", { enum: ["OPEN", "COMPLETED"] }).default("OPEN").notNull(),
+  startDate: text("start_date").default(sql`CURRENT_TIMESTAMP`),
+  endDate: text("end_date"),
+  status: text("status").default("OPEN").notNull(),
 });
-
-// === RELATIONS ===
 
 export const clientsRelations = relations(clients, ({ many }) => ({
   projects: many(projects),
@@ -102,8 +97,6 @@ export const maintenanceRelations = relations(maintenance, ({ one }) => ({
   }),
 }));
 
-// === BASE SCHEMAS ===
-
 export const insertClientSchema = createInsertSchema(clients).omit({ id: true, createdAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertEquipmentSchema = createInsertSchema(equipments).omit({ id: true, createdAt: true });
@@ -111,44 +104,20 @@ export const insertMovementSchema = createInsertSchema(movements).omit({ id: tru
 export const insertMovementItemSchema = createInsertSchema(movementItems).omit({ id: true });
 export const insertMaintenanceSchema = createInsertSchema(maintenance).omit({ id: true, status: true, endDate: true });
 
-// === EXPLICIT API CONTRACT TYPES ===
-
 export type Client = typeof clients.$inferSelect;
 export type InsertClient = z.infer<typeof insertClientSchema>;
-
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
-
 export type Equipment = typeof equipments.$inferSelect;
 export type InsertEquipment = z.infer<typeof insertEquipmentSchema>;
-
 export type Movement = typeof movements.$inferSelect;
 export type InsertMovement = z.infer<typeof insertMovementSchema>;
-
 export type MovementItem = typeof movementItems.$inferSelect;
 export type InsertMovementItem = z.infer<typeof insertMovementItemSchema>;
-
 export type Maintenance = typeof maintenance.$inferSelect;
 export type InsertMaintenance = z.infer<typeof insertMaintenanceSchema>;
 
-// Compound types for API
-export type CreateMovementRequest = InsertMovement & {
-  items: InsertMovementItem[];
-};
-
-export type MovementWithDetails = Movement & {
-  project: Project & { client: Client };
-  items: (MovementItem & { equipment: Equipment })[];
-};
-
-export type ProjectDashboardStats = {
-  projectId: number;
-  totalItemsOnSite: number;
-  lastMovementDate: string | null;
-};
-
-export type EquipmentInventoryStatus = Equipment & {
-  available: number;
-  onSite: number;
-  inMaintenance: number;
-};
+export type CreateMovementRequest = InsertMovement & { items: InsertMovementItem[]; };
+export type MovementWithDetails = Movement & { project: Project & { client: Client }; items: (MovementItem & { equipment: Equipment })[]; };
+export type ProjectDashboardStats = { projectId: number; totalItemsOnSite: number; lastMovementDate: string | null; };
+export type EquipmentInventoryStatus = Equipment & { available: number; onSite: number; inMaintenance: number; };
