@@ -16,11 +16,11 @@ interface LayoutProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory", label: "Inventory", icon: Package },
-  { href: "/clients", label: "Clients & Projects", icon: Briefcase },
-  { href: "/movements", label: "Movements", icon: Truck },
-  { href: "/maintenance", label: "Maintenance", icon: Wrench },
+  { href: "/", label: "Painel", icon: LayoutDashboard },
+  { href: "/inventory", label: "Estoque", icon: Package },
+  { href: "/clients", label: "Clientes e Obras", icon: Briefcase },
+  { href: "/movements", label: "Movimentações", icon: Truck },
+  { href: "/maintenance", label: "Manutenção", icon: Wrench },
 ];
 
 export function Layout({ children }: LayoutProps) {
@@ -52,7 +52,7 @@ export function Layout({ children }: LayoutProps) {
           ))}
         </nav>
         <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center font-mono">
-          v1.0.0 • SYSTEM ACTIVE
+          v1.0.0 • SISTEMA ATIVO
         </div>
       </aside>
 

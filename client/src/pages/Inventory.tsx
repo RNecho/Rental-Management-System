@@ -23,15 +23,15 @@ export default function Inventory() {
     <Layout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-bold text-slate-900">Equipment Inventory</h1>
-          <p className="text-slate-500">Manage asset catalog and stock levels.</p>
+          <h1 className="text-3xl font-display font-bold text-slate-900">Estoque de Equipamentos</h1>
+          <p className="text-slate-500">Gerencie o catálogo de ativos e níveis de estoque.</p>
         </div>
         <button 
           onClick={() => setIsDialogOpen(true)}
           className="flex items-center justify-center px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 font-medium"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Equipment
+          Adicionar Equipamento
         </button>
       </div>
 
@@ -42,7 +42,7 @@ export default function Inventory() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text"
-              placeholder="Search by name or SKU..."
+              placeholder="Buscar por nome ou SKU..."
               className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -56,18 +56,18 @@ export default function Inventory() {
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="px-6 py-4 font-semibold text-slate-700">SKU</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">Equipment Name</th>
+                <th className="px-6 py-4 font-semibold text-slate-700">Nome do Equipamento</th>
                 <th className="px-6 py-4 font-semibold text-slate-700 text-right">Total</th>
-                <th className="px-6 py-4 font-semibold text-slate-700 text-right">On Site</th>
-                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Maint.</th>
-                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Available</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Na Obra</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Manut.</th>
+                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Disponível</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
-                <tr><td colSpan={6} className="p-8 text-center text-slate-500">Loading inventory...</td></tr>
+                <tr><td colSpan={6} className="p-8 text-center text-slate-500">Carregando estoque...</td></tr>
               ) : filteredEquipments?.length === 0 ? (
-                <tr><td colSpan={6} className="p-8 text-center text-slate-500">No equipment found.</td></tr>
+                <tr><td colSpan={6} className="p-8 text-center text-slate-500">Nenhum equipamento encontrado.</td></tr>
               ) : (
                 filteredEquipments?.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
@@ -126,42 +126,42 @@ function CreateEquipmentDialog({ isOpen, onClose, onSubmit, isPending }: any) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-          <h3 className="font-bold text-lg text-slate-900">Add New Equipment</h3>
+          <h3 className="font-bold text-lg text-slate-900">Adicionar Novo Equipamento</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><AlertTriangle className="w-5 h-5" /></button>
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
-            <input {...register("sku")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="e.g. DRILL-01" />
+            <input {...register("sku")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="ex: FURADEIRA-01" />
             {errors.sku && <p className="text-rose-500 text-xs mt-1">{errors.sku.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-            <input {...register("name")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Heavy Duty Drill" />
+            <label className="block text-sm font-medium text-slate-700 mb-1">Nome</label>
+            <input {...register("name")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Furadeira de Impacto" />
             {errors.name && <p className="text-rose-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Total Stock</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Estoque Total</label>
             <input type="number" {...register("totalStock", { valueAsNumber: true })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="0" />
             {errors.totalStock && <p className="text-rose-500 text-xs mt-1">{errors.totalStock.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-            <textarea {...register("description")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" rows={3} placeholder="Optional details..." />
+            <label className="block text-sm font-medium text-slate-700 mb-1">Descrição</label>
+            <textarea {...register("description")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" rows={3} placeholder="Detalhes opcionais..." />
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium">Cancel</button>
+            <button type="button" onClick={onClose} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
             <button 
               type="submit" 
               disabled={isPending}
               className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium shadow-lg shadow-amber-500/25 transition-all disabled:opacity-50"
             >
-              {isPending ? "Creating..." : "Create Equipment"}
+              {isPending ? "Criando..." : "Criar Equipamento"}
             </button>
           </div>
         </form>
