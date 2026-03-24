@@ -77,17 +77,19 @@ function MovementsList({ onCreateClick }: { onCreateClick: () => void }) {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-slate-600 font-medium">
-                      {format(new Date(move.date), "dd 'de' MMM 'de' yyyy", { locale: ptBR })}
+                      {move.date && !isNaN(new Date(move.date).getTime()) 
+                        ? format(new Date(move.date), "dd 'de' MMM 'de' yyyy", { locale: ptBR })
+                        : '-'}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-semibold text-slate-900">{move.project.name}</p>
-                      <p className="text-xs text-slate-500">{move.project.client.name}</p>
+                      <p className="font-semibold text-slate-900">{move.project?.name || 'Obra não encontrada'}</p>
+                      <p className="text-xs text-slate-500">{move.project?.client?.name || '-'}</p>
                     </td>
                     <td className="px-6 py-4 font-mono text-slate-500 text-xs">
                       {move.invoiceNumber || '-'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className="font-bold text-slate-900">{move.itemsCount}</span> itens
+                      <span className="font-bold text-slate-900">{move.itemsCount || 0}</span> itens
                     </td>
                   </tr>
                 ))
