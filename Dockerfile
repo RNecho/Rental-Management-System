@@ -19,8 +19,11 @@ RUN npm run build
 # Make sure the data directory exists to store the SQLite database
 RUN mkdir -p /app/data
 
+# Set the SQLite database URL to use the data folder
+ENV DATABASE_URL="file:/app/data/sqlite.db"
+
 # Expose the application port
 EXPOSE 5000
 
-# Run the app
-CMD ["npm", "run", "start"]
+# Push the database schema and then run the app
+CMD ["sh", "-c", "npm run db:push && npm run start"]
